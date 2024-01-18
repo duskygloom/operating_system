@@ -1,6 +1,10 @@
 #include "item_buffer.c"
 
 #include <stdio.h>
+#include <unistd.h>
+#include <pthread.h>
+
+pthread_mutex_t lock;
 
 void menu()
 {
@@ -35,8 +39,38 @@ void menu()
 	}
 }
 
+void *producer_runner(void *params)
+{
+	while (1) {
+		pthread_mutex_lock(&lock);
+		producer(20);
+		pthread_mutex_unlock(&lock);
+		sleep(1);
+	}
+	return NULL;
+}
+
+void *consumer_runner(void *params)
+{
+	while (1) {
+		pthread_mutex_lock(&lock);
+		consumer();
+		pthread_mutex_unlock(&lock);
+		sleep(2);
+	}
+	return NULL;
+}
+
 int main()
 {
-	menu();
+	pthread_t producer_thread, consumer_thread;
+	pthread_create(&producer_thread, NULL, producer_runner, NULL);
+	pthread_create(&consumer_thread, NULL, consumer_runner, NULL);
+	while (1) {
+		print_buffer();
+		sleep(5);
+	}
+	pthread_join(producer_thread, NULL);
+	pthread_join(consumer_thread, NULL);
 	return 0;
 }

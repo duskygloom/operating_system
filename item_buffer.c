@@ -50,12 +50,14 @@ void print_buffer()
 void producer(double price)
 {
 	static int id = 1;
-	printf("%d %d\n", INDEX(rear+1), INDEX(front));
 	if (rear-front >= ITEM_BUFFER_SIZE) {
 		printf("OVERFLOW\n");
 		return;
 	}
 	set_item(&item_buffer[INDEX(rear)], id++, price);
+	printf("Produced: ");
+	print_item_short(item_buffer[INDEX(rear)]);
+	putchar('\n');
 	++rear;
 }
 
